@@ -25,3 +25,10 @@ class User(AbstractUser):
         if self.is_admin:
             self.is_staff = True
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"

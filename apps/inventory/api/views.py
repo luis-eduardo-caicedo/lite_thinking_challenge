@@ -22,6 +22,10 @@ class InventoryListCreateView(APIView):
         if not user.is_authenticated or not user.is_admin:
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
+        product_id = request.data.get('product')
+        if Inventory.objects.filter(product_id=product_id, is_active=True).exists():
+            return Response({'detail': 'This product is already in inventory.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = InventorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -48,7 +52,7 @@ class InventoryDetailView(APIView):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
         item = self.get_object(pk)
-        serializer = InventorySerializer(item, data=request.data)
+        serializer = InventorySerializer(item, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -62,3 +66,18 @@ class InventoryDetailView(APIView):
         item.is_active = False
         item.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class InventoryByProductView(APIView):
+    """
+    GET /api/inventory/by-product/{product_id}/ → Obtener inventario por producto
+    """
+
+    def get(self, request, product_id):
+        try:
+            inventory = Inventory.objects.get(product_id=product_id, is_active=True)
+        except Inventory.DoesNotExist:
+            return Response({'detail': 'No inventory found for this product.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = InventorySerializer(inventory)
+        return Response(serializer.data)

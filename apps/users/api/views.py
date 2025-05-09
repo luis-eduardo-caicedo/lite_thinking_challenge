@@ -54,7 +54,7 @@ class UserDetailView(APIView):
         data = request.data.copy()
         if 'password' in data:
             data['password'] = make_password(data['password'])
-        serializer = UserSerializer(user, data=data, partial=False)
+        serializer = UserSerializer(user, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         updated = serializer.save()
         return Response(UserSerializer(updated).data)
@@ -87,3 +87,10 @@ class CustomTokenRefreshView(TokenRefreshView):
     """
     # Usa el serializer por defecto de SimpleJWT
     pass
+
+class MeView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

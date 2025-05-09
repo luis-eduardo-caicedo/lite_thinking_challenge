@@ -9,3 +9,7 @@ class Inventory(models.Model):
 
     def __str__(self):
         return f"{self.product.name} – {self.quantity}"
+
+    class Meta:
+        verbose_name = "Inventory Item"
+        verbose_name_plural = "Inventory"

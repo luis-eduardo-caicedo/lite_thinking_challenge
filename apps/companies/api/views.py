@@ -29,7 +29,7 @@ class CompanyListCreateView(APIView):
     
 
 class CompanyDetailView(APIView):
-    """
+    """ 
     GET    /api/companies/{nit}/  → retrieve one company (public)
     PUT    /api/companies/{nit}/  → update company (admin only)
     DELETE /api/companies/{nit}/  → logical delete (admin only)
@@ -48,7 +48,7 @@ class CompanyDetailView(APIView):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
         company = self.get_object(nit)
-        serializer = CompanySerializer(company, data=request.data)
+        serializer = CompanySerializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)

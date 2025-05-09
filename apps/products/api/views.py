@@ -23,6 +23,10 @@ class ProductListCreateView(APIView):
         if not user.is_authenticated or not user.is_admin:
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
+        code = request.data.get('code')
+        if Product.objects.filter(code=code, is_active=True).exists():
+            return Response({'detail': 'A product with this code already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -50,7 +54,7 @@ class ProductDetailView(APIView):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
         product = self.get_object(pk)
-        serializer = ProductSerializer(product, data=request.data)
+        serializer = ProductSerializer(product, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)

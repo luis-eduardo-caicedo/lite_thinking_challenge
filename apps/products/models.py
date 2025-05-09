@@ -12,3 +12,10 @@ class Product(models.Model):
                             default_currency='USD')
     company    = models.ForeignKey(Company, on_delete=models.CASCADE)
     is_active  = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.name} – {self.code}"
+
+    class Meta:
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
